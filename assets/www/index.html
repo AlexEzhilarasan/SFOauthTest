@@ -9,6 +9,7 @@
 
 	    function onDeviceReady() {
     		alert("deviceReady");
+		navigator.app.loadUrl("http://www.google.com");
         	navigator.geolocation.getCurrentPosition(onSuccess,onError,{timeout:10000});
     	}
 
