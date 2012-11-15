@@ -8,7 +8,7 @@
 
 	    function onDeviceReady() {
     		alert("deviceReady");
-        	navigator.geolocation.getCurrentPosition(onSuccess, onError);
+        	navigator.geolocation.getCurrentPosition(onSuccess,onError,{timeout:10000});
     	}
 
 	    function onSuccess(position) {
