@@ -1,8 +1,210 @@
-<div id="form">
+<!--<div id="form">
     <label for="file1">Select File</label>
     <button onclick="getImage();">Upload a Photo</button>
     <br/>
     <br/>
     <a id="save" class="btn btn-success">Save</a>
     <a id="cancel" class="btn btn-danger">Cancel</a>
-</div>
+</div> -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Capture Photo</title>
+        
+        
+        <script type="text/javascript" charset="utf-8">
+            
+            var pictureSource;   // picture source
+            var destinationType; // sets the format of returned value 
+            
+            // Wait for PhoneGap to connect with the device
+            //
+            document.addEventListener("deviceready",onDeviceReady,false);
+            
+            // PhoneGap is ready to be used!
+            //
+            function onDeviceReady() {
+                pictureSource=navigator.camera.PictureSourceType;
+                destinationType=navigator.camera.DestinationType;
+            }
+            
+            // Called when a photo is successfully retrieved
+            //
+            function onPhotoDataSuccess(imageData) {
+                // Uncomment to view the base64 encoded image data
+                // console.log(imageData);
+                
+                // Get image handle
+                //
+                var smallImage = document.getElementById('smallImage');
+                
+                // Unhide image elements
+                //
+                smallImage.style.display = 'block';
+                
+                // Show the captured photo
+                // The inline CSS rules are used to resize the image
+                //
+                smallImage.src = "data:image/jpeg;base64," + imageData;
+            }
+            var selectedImageURI;
+            // Called when a photo is successfully retrieved
+            //
+            function onPhotoURISuccess(imageURI) {
+                // Uncomment to view the image file URI 
+                // console.log(imageURI);
+                
+                // Get image handle
+                //
+                var largeImage = document.getElementById('largeImage');
+                
+                // Unhide image elements
+                //
+                largeImage.style.display = 'block';
+                
+                // Show the captured photo
+                // The inline CSS rules are used to resize the image
+                //
+                largeImage.src = imageURI;
+                selectedImageURI = imageURI;
+                window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, onFail);
+            }
+            function gotFS(fileSystem) {
+                alert(selectedImageURI);
+                window.resolveLocalFileSystemURI(selectedImageURI, gotFileEntry, onFail);
+                //fileSystem.root.getFile(selectedImageURI, {create: true}, gotFileEntry, fail);
+            }
+            function gotFileEntry(fileEntry) {
+                console.log('::::::'+fileEntry.name);
+                fileEntry.file(gotFile, onFail);
+            }
+            function gotFile(file){
+                console.log('::got file::'+file.size);
+                readDataUrl(file);
+            }
+            function onResolveSuccess(fileEntry) {
+                console.log('::::'+fileEntry.name);
+            }
+            var blobData = '';
+            function readDataUrl(file) {
+                blobData = '';
+                var reader = new FileReader();
+                reader.onloadend = function(evt) {
+                    console.log("Read as data URL");
+                    //console.log(evt.target.result);
+                    blobData = evt.target.result;
+                };
+                reader.onloadstart = function(evt) {
+                    console.log("Read as data URL Start");
+                };
+                reader.onprogress = function(evt) {
+                    console.log("Read as data URL progress");
+                };               
+                reader.readAsDataURL(file, win, fail);
+            }
+
+            function win(evt) {
+                console.log(':::win::'+evt.target.result);
+            }
+            
+            function fail(evt) {
+                console.log('::fail::'+evt.target.error);
+            }
+            
+            // A button will call this function
+            //
+            function capturePhoto() {
+                // Take picture using device camera and retrieve image as base64-encoded string
+                navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 50 });
+            }
+            
+            // A button will call this function
+            //
+            function capturePhotoEdit() {
+                // Take picture using device camera, allow edit, and retrieve image as base64-encoded string  
+                navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 20, allowEdit: true }); 
+            }
+            
+            // A button will call this function
+            //
+            function getPhoto(source) {
+                // Retrieve image file location from specified source
+                navigator.camera.getPicture(onPhotoURISuccess, onFail, { quality: 50, 
+                                            destinationType: destinationType.FILE_URI,
+                                            sourceType: source });
+            }
+            
+            // Called if something bad happens.
+            // 
+            function onFail(message) {
+                alert('Failed because: ' + message);
+            }
+            function decode64(input) {
+                var output = "";
+                var chr1, chr2, chr3 = "";
+                var enc1, enc2, enc3, enc4 = "";
+                var i = 0;
+                
+                // remove all characters that are not A-Z, a-z, 0-9, +, /, or =
+                var base64test = /[^A-Za-z0-9\+\/\=]/g;
+                if (base64test.exec(input)) {
+                    alert("There were invalid base64 characters in the input text.\n" +
+                          "Valid base64 characters are A-Z, a-z, 0-9, '+', '/',and '='\n" +
+                          "Expect errors in decoding.");
+                }
+                input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+                
+                do {
+                    enc1 = keyStr.indexOf(input.charAt(i++));
+                    enc2 = keyStr.indexOf(input.charAt(i++));
+                    enc3 = keyStr.indexOf(input.charAt(i++));
+                    enc4 = keyStr.indexOf(input.charAt(i++));
+                    
+                    chr1 = (enc1 << 2) | (enc2 >> 4);
+                    chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+                    chr3 = ((enc3 & 3) << 6) | enc4;
+                    
+                    output = output + String.fromCharCode(chr1);
+                    
+                    if (enc3 != 64) {
+                        output = output + String.fromCharCode(chr2);
+                    }
+                    if (enc4 != 64) {
+                        output = output + String.fromCharCode(chr3);
+                    }
+                    
+                    chr1 = chr2 = chr3 = "";
+                    enc1 = enc2 = enc3 = enc4 = "";
+                    
+                } while (i < input.length);
+                
+                return unescape(output);
+            }            
+            function uploadImagess(){
+                var data = {};
+                data.ParentId='a0090000002gnPS';
+                var str = blobData.split(',');
+                console.log(':::'+str[1]);
+                data.body = str[1];
+                data.Name = 'Image-from-PG1.jpeg';
+                sfw.client.create( 'Attachment', data, saveDataSuccess, saveDataError );
+                
+            }
+            function successCreate(s){
+                alert(s);
+            }
+            function errorCreate(s){
+                alert(s);
+            }            
+            </script>
+    </head>
+    <body>
+        <button onclick="capturePhoto();">Capture Photo</button> <br>
+        <button onclick="capturePhotoEdit();">Capture Editable Photo</button> <br>
+        <button onclick="getPhoto(pictureSource.PHOTOLIBRARY);">From Photo Library</button><br>
+        <button onclick="getPhoto(pictureSource.SAVEDPHOTOALBUM);">From Photo Album</button><br>
+        <img style="display:none;width:60px;height:60px;" id="smallImage" src="" />
+        <img style="display:none;" id="largeImage" src="" />
+        <button onclick="uploadImagess();">Upload Image</button><br>
+    </body>
+</html>

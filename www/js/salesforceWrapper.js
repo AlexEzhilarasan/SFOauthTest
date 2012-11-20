@@ -2,7 +2,7 @@
 function SalesforceWrapper() {
     /* AUTHENTICATION PARAMETERS */
     this.loginUrl = 'https://login.salesforce.com/';
-    this.clientId = '3MVG9y6x0357Hleex50VVy7Kua8u0oh3UlgkMi8KU_bhZ6z4hI0v6srObX0QNQ3UnR0U3iTdNbWbBJ_YyjuHp';
+    this.clientId = '3MVG9Y6d_Btp4xp5WIBgxEQC294fvrX.8RAzSviKlLjW99IE_mAlVNZ.z8qg8pe6gtExkHfVv4CLQf99qQS9A';
     this.redirectUri = 'https://login.salesforce.com/services/oauth2/success';
     
     /* CLASS VARIABLES */
